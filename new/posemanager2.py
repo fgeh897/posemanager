@@ -372,23 +372,23 @@ def custom_pose_rows_gen(inst, target, context, **kwargs):
     # --- 单独动作收藏 (完全恢复原始无删减状态) ---
     if pack_type == 'POSES':
         if not CACHE_BUILT: build_cache_safe()
-        yield ObjectPickerRow(name=get_stbl_text(STR_DYN_TOGGLE_MODE_1, current_mode_str),
-                              row_description=get_stbl_text(STR_DYN_TOGGLE_MODE_1_DESC), icon=MY_CUSTOM_ICON,
-                              tag="TOGGLE_MODE_BTN")
-        yield ObjectPickerRow(name=get_stbl_text(STR_S_BTN_CLEAR), row_description=get_stbl_text(STR_S_BTN_CLEAR_DESC),
-                              icon=MY_CUSTOM_ICON, tag="CLEAR_ALL_FAV_BTN")
+        
+        # 只有原版的模式切换和一键清空
+        yield ObjectPickerRow(name=get_stbl_text(STR_DYN_TOGGLE_MODE_1, current_mode_str), row_description=get_stbl_text(STR_DYN_TOGGLE_MODE_1_DESC), icon=MY_CUSTOM_ICON, tag="TOGGLE_MODE_BTN")
+        yield ObjectPickerRow(name=get_stbl_text(STR_S_BTN_CLEAR), row_description=get_stbl_text(STR_S_BTN_CLEAR_DESC), icon=MY_CUSTOM_ICON, tag="CLEAR_ALL_FAV_BTN")
 
         if not FAVORITE_POSES:
             yield ObjectPickerRow(name=get_stbl_text(STR_S_EMPTY), icon=MY_CUSTOM_ICON)
         else:
-            fav_poses_sorted = [GLOBAL_ALL_POSES_CACHE.get(p) for p in FAVORITE_POSES if
-                                'fgeh' not in str(p).lower() and GLOBAL_ALL_POSES_CACHE.get(p)]
-            fav_poses_sorted.sort(
-                key=lambda x: x['pose'].pose_display_name.lower() if hasattr(x['pose'], 'pose_display_name') else "")
-            for item in fav_poses_sorted:
+            # 100% 沿用你原本完美的按作者排序逻辑
+            fav_display_list = [GLOBAL_ALL_POSES_CACHE.get(p) for p in FAVORITE_POSES if 'fgeh' not in str(p).lower() and GLOBAL_ALL_POSES_CACHE.get(p)]
+            fav_display_list.sort(key=lambda x: x['pack_name'])
+            
+            for item in fav_display_list:
                 p = item['pose']
                 yield ObjectPickerRow(name=p.pose_display_name, icon=p.icon, row_description=p.pose_description, tag=p)
-        return
+        
+        return # 这个拦截底层的防崩防火墙必须留着
 
     # --- 普通包内 ---
     if RETURN_TO_FAV_ON_CLOSE and pack == GLOBAL_TRACED_PACK_REF:
